@@ -1,0 +1,8 @@
+NEXT_PUBLIC_SUPABASE_URL=https://woprnbvfupkhumnzsgaz.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_UCMLFw7TEbHIqf9tROE1Ww_U...nano .env.local
+node -e "JSON.parse(require('fs').readFileSync('package.json','utf8')); console.log('package.json OK')"Missing Supabase public environment variables
+~/project/jijiga-express-live-frontend/.env.local
+NEXT_PUBLIC_SUPABASE_URL=https://woprnbvfupkhumnzsgaz.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=YOUR_SUPABASE_PUBLISHABLE_KEYsb_publishable_UCMLFw7TEbHIqf9tROE1Ww_UOzxI9pO
+npm run build
+

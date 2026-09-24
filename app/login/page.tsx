@@ -1,0 +1,11 @@
+"use client";
+import { FormEvent, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { api } from "../../lib/api";
+
+export default function Login(){
+ const router=useRouter(); const [email,setEmail]=useState(""); const [password,setPassword]=useState(""); const [name,setName]=useState(""); const [mode,setMode]=useState<"signin"|"signup">("signin"); const [error,setError]=useState(""); const [busy,setBusy]=useState(false);
+ useEffect(()=>{api.supabase.auth.getUser().then(({data})=>{if(data.user) router.replace("/dashboard")})},[router]);
+ async function submit(e:FormEvent){e.preventDefault();setError("");setBusy(true);try{if(mode==="signup"){const {error}=await api.supabase.auth.signUp({email,password,options:{data:{full_name:name}}});if(error)throw error;setError("Account created. Check your email if confirmation is enabled, then sign in.");setMode("signin")}else{const {error}=await api.supabase.auth.signInWithPassword({email,password});if(error)throw error;router.replace("/dashboard")}}catch(err){setError(err instanceof Error?err.message:String(err))}finally{setBusy(false)}}
+ return <main className="login"><div className="login-card"><div className="brand">Jijiga Express</div><p className="muted">Secure sign in for the live operations app.</p><form className="stack" onSubmit={submit}>{mode==="signup"&&<label className="stack"><span className="label">Full name</span><input className="input" value={name} onChange={e=>setName(e.target.value)} required/></label>}<label className="stack"><span className="label">Email</span><input className="input" type="email" value={email} onChange={e=>setEmail(e.target.value)} required/></label><label className="stack"><span className="label">Password</span><input className="input" type="password" minLength={8} value={password} onChange={e=>setPassword(e.target.value)} required/></label>{error&&<div className={error.toLowerCase().includes("created")?"notice":"error"}>{error}</div>}<button className="btn" disabled={busy}>{busy?"Working…":mode==="signin"?"Sign in":"Create account"}</button></form><div className="sep"/><button className="btn secondary" onClick={()=>{setMode(mode==="signin"?"signup":"signin");setError("")}}>{mode==="signin"?"Create a new account":"Back to sign in"}</button></div></main>
+}
