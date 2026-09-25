@@ -2,20 +2,22 @@ import { createSupabaseBrowserClient } from "./supabase-browser";
 
 export type Role = "customer" | "rider" | "mamila" | "dispatcher" | "owner_admin";
 
-const supabase = createSupabaseBrowserClient();
+const getSupabase = () => createSupabaseBrowserClient();
 
 async function rpc<T>(fn: string, args: Record<string, unknown> = {}) {
-  const { data, error } = await supabase.rpc(fn, args);
+  const { data, error } = await getSupabase().rpc(fn, args);
   if (error) throw new Error(`${fn}: ${error.message}`);
   return data as T;
 }
 
 export const api = {
-  supabase,
+  get supabase() {
+    return getSupabase();
+  },
   async currentRole(): Promise<{ role: Role; userId: string }> {
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { session } } = await getSupabase().auth.getSession();
     if (!session?.access_token) throw new Error("Authentication required");
-    const { data, error } = await supabase.functions.invoke("clever-api", {
+    const { data, error } = await getSupabase().functions.invoke("clever-api", {
       body: { action: "health" },
       headers: { Authorization: `Bearer ${session.access_token}` },
     });
@@ -44,9 +46,9 @@ export const api = {
   advanceEEUOrder: (orderId: string, status: string) => rpc<string>("advance_eeu_order", { p_order_id: orderId, p_next_status: status }),
   verifyDeliveryOtp: (orderId: string, code: string) => rpc<boolean>("verify_delivery_otp", { p_order_id: orderId, p_code: code }),
   issueDeliveryOtp: async (orderId: string) => {
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { session } } = await getSupabase().auth.getSession();
     if (!session?.access_token) throw new Error("Authentication required");
-    const { data, error } = await supabase.functions.invoke("clever-api", {
+    const { data, error } = await getSupabase().functions.invoke("clever-api", {
       body: { action: "issue_delivery_otp", order_id: orderId },
       headers: { Authorization: `Bearer ${session.access_token}` },
     });
